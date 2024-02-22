@@ -61,7 +61,7 @@ def instantiate_blockchain_handlers(app_config):
     chain = app_config.chain
     secret_manager = initialize_signer(app_config)
     certificate_batch_handler = CertificateBatchHandler(secret_manager=secret_manager,
-                                                        certificate_handler=CertificateV3Handler(),
+                                                        certificate_handler=CertificateV3Handler(app_config),
                                                         merkle_tree=MerkleTreeGenerator(),
                                                         config=app_config)
     if chain.is_mock_type():
@@ -69,7 +69,7 @@ def instantiate_blockchain_handlers(app_config):
     # ethereum chains
     elif chain.is_ethereum_type():
         nonce = app_config.nonce
-        cost_constants = EthereumTransactionCostConstants(app_config.max_priority_fee_per_gas, 
+        cost_constants = EthereumTransactionCostConstants(app_config.max_priority_fee_per_gas,
                                                           app_config.gas_price, app_config.gas_limit)
         connector = EthereumServiceProviderConnector(chain, app_config)
         transaction_handler = EthereumTransactionHandler(connector, nonce, cost_constants, secret_manager,
