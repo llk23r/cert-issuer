@@ -4,7 +4,12 @@ MAINTAINER Kim Duffy "kimhd@mit.edu"
 USER root
 
 COPY . /cert-issuer
-COPY conf_regtest.ini /etc/cert-issuer/conf.ini
+
+# Have a copy of conf.ini locally
+COPY conf.ini /etc/cert-issuer/conf.ini
+
+# Have a copy of pk_issuer.txt locally
+COPY pk_issuer.txt /cert-issuer/pk_issuer.txt
 
 RUN apk add --update \
     bash \
@@ -39,8 +44,8 @@ RUN apk add --update \
     && rm -r /usr/lib/python*/ensurepip \
     && rm -rf /var/cache/apk/* \
     && rm -rf /root/.cache
-
-
+RUN ln -sf /usr/bin/python3 /usr/bin/python
+RUN pip install --upgrade pip
+RUN cd /cert-issuer && python setup.py experimental --blockchain=ethereum
+RUN cp /cert-issuer/examples/data-testnet/unsigned_certificates/verifiable-credential.json /etc/cert-issuer/data/unsigned_certificates/
 ENTRYPOINT bitcoind -daemon && bash
-
-
